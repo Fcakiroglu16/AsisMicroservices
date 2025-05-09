@@ -2,5 +2,6 @@
 
 Post {{Microservice1.API_HostAddress}}/api/users
 Accept: application/json
-
 ###
+GET {{Microservice1.API_HostAddress}}/api/users
+Accept: application/json

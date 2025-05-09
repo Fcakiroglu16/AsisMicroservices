@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  microservice1.api:
+    image: microservice1api_image:v1
+    build:
+      context: .
+      dockerfile: Microservice1.API/Dockerfile
+  microservice2.api:
+    image: microservice2api_image:v1
+    build:
+      context: .
+      dockerfile: Microservice2.API/Dockerfile

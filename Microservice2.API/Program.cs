@@ -15,7 +15,7 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        //cfg.UseConcurrencyLimit(20);
+        cfg.UseConcurrencyLimit(5);
 
         cfg.PrefetchCount = 10;
         cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
