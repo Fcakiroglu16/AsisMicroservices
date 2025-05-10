@@ -1,5 +1,6 @@
 using MassTransit;
 using Microservice2.API.Consumers;
+using Microservice2.API.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +10,11 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 //add masstransit
+
+
 builder.Services.AddMassTransit(x =>
 {
+    var rabbitMqOptions = builder.Configuration.GetSection(nameof(RabbitMqOption)).Get<RabbitMqOption>();
     x.AddConsumer<UserCreatedEventConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
@@ -23,7 +27,11 @@ builder.Services.AddMassTransit(x =>
 
         cfg.UseDelayedRedelivery(r => r.Interval(3, TimeSpan.FromMinutes(10)));
 
-        cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ"));
+        cfg.Host($"{rabbitMqOptions!.Host}", hostConfiguration =>
+        {
+            hostConfiguration.Username(rabbitMqOptions.UserName);
+            hostConfiguration.Password(rabbitMqOptions.Password);
+        });
 
 
         // register consumer

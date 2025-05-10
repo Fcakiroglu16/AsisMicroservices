@@ -10,3 +10,18 @@ services:
     build:
       context: .
       dockerfile: Microservice2.API/Dockerfile
+  microservice3.api:
+    image: microservice3api_image:v1
+    build:
+      context: .
+      dockerfile: Microservice3.API/Dockerfile
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine
+  sqlserver:
+   image: mcr.microsoft.com/mssql/server:2022-latest
+volumes:
+    uploads:
+        driver: local
+    sql_data:
+        driver: local
+

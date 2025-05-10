@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microservice1.API.Options;
 using Microservice1.API.Services;
 using Polly;
 using Polly.Extensions.Http;
@@ -6,13 +7,27 @@ using Polly.Extensions.Http;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+
+var rabbitMqOptions = builder.Configuration.GetSection(nameof(RabbitMqOption)).Get<RabbitMqOption>();
+
 //add masstransit
-builder.Services.AddMassTransit(x => { x.UsingRabbitMq((context, cfg) => { cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ")); }); });
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host($"{rabbitMqOptions!.Host}", hostConfiguration =>
+        {
+            hostConfiguration.Username(rabbitMqOptions.UserName);
+            hostConfiguration.Password(rabbitMqOptions.Password);
+        });
+    });
+});
 
 // Polly politikasını yapılandırıyoruz
 var retryPolicy = HttpPolicyExtensions
@@ -50,6 +65,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseAuthorization();
 
 app.MapControllers();

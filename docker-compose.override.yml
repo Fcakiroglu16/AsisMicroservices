@@ -5,11 +5,50 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_HTTP_PORTS=8080
       - Microservices:Microservice2BaseUrl=http://microservice2.api:8080
+      - RabbitMqOption:Host=rabbitmq
+      - RabbitMqOption:Port=5672
+      - RabbitMqOption:UserName=${RabbitMq_Username}
+      - RabbitMqOption:Password=${RabbitMq_Password}
     ports:
       - "5000:8080"
+    volumes:
+      - uploads:/app/wwwroot/uploads
   microservice2.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_HTTP_PORTS=8080
+      - RabbitMqOption:Host=rabbitmq
+      - RabbitMqOption:Port=5672
+      - RabbitMqOption:UserName=${RabbitMq_Username}
+      - RabbitMqOption:Password=${RabbitMq_Password}
     ports:
-      - "5010:8080"
+      - "5010:8080" 
+  microservice3.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=Password12*
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/certificates/asis_certificate.pfx
+      - ConnectionStrings:SqlServer=Server=sqlserver,1433;Database=AsisDb;User=Sa;Password=Password12*;Trusted_Connection=False;TrustServerCertificate=True;Integrated Security=False
+    volumes:
+     - c:/certificates:/certificates 
+    ports:
+      - "5020:8080"
+      - "5022:8081"
+  sqlserver:
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Password12*
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+  rabbitmq:
+    environment:
+      - RABBITMQ_DEFAULT_USER=user 
+      - RABBITMQ_DEFAULT_PASS=password 
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+ 
